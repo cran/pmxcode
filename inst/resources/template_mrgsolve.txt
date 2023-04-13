@@ -1,0 +1,21 @@
+
+//------------------------------------------------------------------------------
+// Name: @PATH
+//
+// Created on @TIMESTAMP @USER
+//         for mrgsolve and R @VERSION
+//------------------------------------------------------------------------------
+// Purpose: @PURPOSE
+
+@NMEXT
+@PLUGIN
+@GLOBAL
+@CMT
+@PARAM
+@OMEGA
+@SIGMA
+@MAIN
+@PRED
+@ODE
+@TABLE
+@CAPTURE
