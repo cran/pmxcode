@@ -1,7 +1,7 @@
 
 #' Creation of NONMEM code
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param template Text template
 #' @param vars Reactive object - List of variables in data file
 #' @param advan Reactive object - NONMEM ADVAN value
@@ -245,8 +245,20 @@ get_nonmem_code <- function(
       parms = parms,
       varianceTable = varianceTable,
       parm_lib = parm_lib,
-      rv_lib = rv_lib
+      rv_lib = rv_lib,
+      mu = as.logical(input$muInput)
     )
+    if ( as.logical(input$muInput) ){
+      new <- sub(
+        '^[$]PK',
+        paste(
+          '$PK',
+          '  ; Note that MU_ variable definitions cannot include time-varying covariates\n',
+          sep = '\n'
+        ),
+        new
+      )
+    }
   }
 
   # Replace @DES
@@ -328,7 +340,7 @@ get_nonmem_code <- function(
 
 #' Replacement of @PROB1 and @PROB2 tags
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 
 replace_problem <- function(
@@ -365,7 +377,7 @@ replace_problem <- function(
 
 #' Replacement of @INPUT tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param vars Character vector of variable names
 
@@ -409,7 +421,7 @@ replace_input <- function(input, new, vars){
 
 #' Replacement of @DATA tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 
 replace_data <- function(input, new){
@@ -463,7 +475,7 @@ replace_data <- function(input, new){
 
 #' Replacement of @SUBROUTINE tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param advan Reactive object - NONMEM ADVAN value
 #' @param trans Reactive object - NONMEM TRANS value
@@ -515,7 +527,7 @@ replace_subroutine <- function(
 
 #' Replace @MODEL tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param model_lib Library for $MODEL replacement
 #' @param isPRED Reactive object - is model coded with $PRED?
@@ -636,7 +648,7 @@ replace_model <- function(
 
 #' Replacement of @ABBREVIATED tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param vars Character vector of variable names
 
@@ -854,7 +866,7 @@ replace_omega <- function(
 #' Replacement of @SIGMA tag
 #'
 #' @param new Text template
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param rvTable Residual variability selection
 #'
 
@@ -982,7 +994,7 @@ replace_sigma <- function(new, input, rvTable){
 #' Replacement of @PRIOR tag
 #'
 #' @param new Text template
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param parms Parameter selection
 #' @param varianceTable Variability selection
 #' @param estimations Table of estimation tasks
@@ -1212,7 +1224,7 @@ replace_prior <- function(
 
 #' Replace @PK and @PRED tags
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param preamble_code Preamble code
 #' @param parms_code Typical and individual parameter code
@@ -1224,6 +1236,7 @@ replace_prior <- function(
 #' @param varianceTable Variability selection
 #' @param parm_lib Library of parameters
 #' @param rv_lib  Library for residual variability replacement
+#' @param mu A logical indicator for mu transformation
 
 replace_pk_pred <- function(
     input,
@@ -1237,7 +1250,8 @@ replace_pk_pred <- function(
     parms,
     varianceTable,
     parm_lib,
-    rv_lib
+    rv_lib,
+    mu
 ){
 
   if ( isTruthy(input$mapTable) ){
@@ -1262,8 +1276,13 @@ replace_pk_pred <- function(
 
       if ( length(bio) > 0 ){
         f_row <- which(
-          grepl( glue::glue("^\\s+{bio}\\s+=\\s+TV{bio}"), parms_code$PK )
+          grepl( glue::glue("^\\s+{bio}\\s+=.*TV{bio}"), parms_code$PK )
         )
+        if ( mu & length(f_row) == 0 ){
+          f_row <- which(
+            grepl( glue::glue("^\\s+{bio}\\s+=.*MU_"), parms_code$PK )
+          )
+        }
         f_line <- parms_code$PK[f_row]
         parms_code$PK <- parms_code$PK[-f_row]
 
@@ -1798,7 +1817,7 @@ replace_pk_pred <- function(
 
 #' Replace @DES tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param advan Reactive object - NONMEM ADVAN value
 #' @param trans Reactive object - NONMEM TRANS value
@@ -2016,7 +2035,7 @@ replace_des <- function(
 
 #' Replace @ERROR tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param advan Reactive object - NONMEM ADVAN value
 #' @param trans Reactive object - NONMEM TRANS value
@@ -2371,7 +2390,7 @@ replace_error <- function(
 
 #' Replace @TASK tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param estimations Table of estimation tasks
 #' @param isODE Reactive object - is model coded with ODEs?
@@ -2550,7 +2569,7 @@ replace_task <- function(
 
 #' Replace @TABLE tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 #' @param vars Reactive object - List of variables in data file
 
@@ -2586,21 +2605,21 @@ replace_table <- function(
     mappingTable <- hot_to_r( input$mapTable )
 
     # Add TIME
-    if ( as.character(mappingTable %>% dplyr::slice(n = 2) %>% dplyr::pull(.data$Variable)) != "" ){
+    if ( as.character(mappingTable %>% dplyr::slice( 2 ) %>% dplyr::pull(.data$Variable)) != "" ){
       tmp <- c(
         tmp,
-        as.character(mappingTable %>% dplyr::slice(n = 2) %>% dplyr::pull(.data$NONMEM))
+        as.character(mappingTable %>% dplyr::slice( 2 ) %>% dplyr::pull(.data$NONMEM))
       )
     }
     # Add TAD
     tmp <- c(
       tmp,
-      as.character(mappingTable %>% dplyr::slice(n = 6) %>% dplyr::pull(.data$Variable))
+      as.character(mappingTable %>% dplyr::slice( 6 ) %>% dplyr::pull(.data$Variable))
     )
     # Add DVID
     tmp <- c(
       tmp,
-      as.character(mappingTable %>% dplyr::slice(n = 5) %>% dplyr::pull(.data$Variable))
+      as.character(mappingTable %>% dplyr::slice( 5 ) %>% dplyr::pull(.data$Variable))
     )
   } else {
     if ( input$pkInput %in% c("pk", "linmat", "ode") |
@@ -2795,7 +2814,7 @@ replace_table <- function(
 
 #' Replace $TAGs tag
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param new Text template
 
 replace_tags <- function(
@@ -2871,7 +2890,7 @@ replace_tags <- function(
 
 #' Get NONMEM model parameter code lines as list
 #'
-#' @param input Internal parameter for {shiny}
+#' @param input Internal parameter for \code{shiny}
 #' @param parms Parameter selection
 #' @param varianceTable Variability selection
 #' @param mu A logical indicator for mu transformation
@@ -2987,7 +3006,22 @@ get_parms_code <- function(input, parms, varianceTable, mu){
 
   }
 
-  list(tvPK = tvPK, PK = PK, tvPD = tvPD, PD = PD, tvOT = tvOT, OT = OT)
+  split_line <- function(s){
+    if ( length(s) > 0 & is.character(s)){
+      unlist(strsplit(s, '\n'))
+    } else {
+      s
+    }
+  }
+
+  list(
+    tvPK = split_line(tvPK),
+    PK = split_line(PK),
+    tvPD = split_line(tvPD),
+    PD = split_line(PD),
+    tvOT = split_line(tvOT),
+    OT = split_line(OT)
+  )
 
 }
 
@@ -3011,7 +3045,7 @@ get_individual_parm_code <- function(parms, varianceTable, iparm, ieta, mu){
       "Additive" = glue::glue("  {parm} = MU_{ieta} + ETA({ieta})"),
       "Exponential" = glue::glue("  {parm} = EXP(MU_{ieta}+ETA({ieta}))"),
       "Logit" =
-        if ( parms$Low[iparm] == 0 & parms$High[iparm] == 1 ){
+        if ( parms$Min[iparm] == 0 & parms$Max[iparm] == 1 ){
           # Individual parameter within 0 and 1
           glue::glue(
             paste(
@@ -3022,7 +3056,7 @@ get_individual_parm_code <- function(parms, varianceTable, iparm, ieta, mu){
             ),
             .trim = FALSE
           )
-        } else if ( parms$Low[iparm] == 0 & parms$High[iparm] != 1 ){
+        } else if ( parms$Min[iparm] == 0 & parms$Max[iparm] != 1 ){
           # Individual parameter between 0 and a positive value different from 1
           glue::glue(
             paste(
@@ -3031,7 +3065,7 @@ get_individual_parm_code <- function(parms, varianceTable, iparm, ieta, mu){
               "  {parm} = {hi}*EXP(MU_{ieta})/(1 + EXP(MU_{ieta}))",
               sep = "\n"
             ),
-            hi = parms$High[iparm],
+            hi = parms$Max[iparm],
             .trim = FALSE
           )
         } else {
@@ -3043,8 +3077,8 @@ get_individual_parm_code <- function(parms, varianceTable, iparm, ieta, mu){
               "  {parm} = {lo} + ({hi} - {lo})*EXP(MU_{ieta})/(1 + EXP(MU_{ieta}))",
               sep = "\n"
             ),
-            lo = parms$Low[iparm],
-            hi = parms$High[iparm],
+            lo = parms$Min[iparm],
+            hi = parms$Max[iparm],
             .trim = FALSE
           )
         }
