@@ -1,3 +1,7 @@
+# pmxcode 0.1.3
+
+* Bug fixes with target-mediated elimination
+
 # pmxcode 0.1.2
 
 * Bug fixes with logit variability model
