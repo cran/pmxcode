@@ -1,3 +1,7 @@
+# pmxcode 0.1.4
+
+* Bug fixes in M3 method coding and app crash with certain model combination.
+
 # pmxcode 0.1.3
 
 * Bug fixes with target-mediated elimination
