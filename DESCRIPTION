@@ -1,6 +1,6 @@
 Package: pmxcode
 Title: Create Pharmacometric Models
-Version: 0.1.4
+Version: 0.2.0
 Authors@R: 
     person("Sebastien", "Bihorel", , "sb.pmlab@gmail.com", role = c("cre", "aut"))
 Description: Provides a user interface to create or modify pharmacometric
@@ -16,8 +16,8 @@ Encoding: UTF-8
 RoxygenNote: 7.3.1
 Depends: shinyBS
 NeedsCompilation: no
-Packaged: 2024-10-19 14:45:23 UTC; sebastien
+Packaged: 2025-03-01 03:47:18 UTC; sebastien
 Author: Sebastien Bihorel [cre, aut]
 Maintainer: Sebastien Bihorel <sb.pmlab@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-10-19 15:20:02 UTC
+Date/Publication: 2025-03-01 04:10:02 UTC
